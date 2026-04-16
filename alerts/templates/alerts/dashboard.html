@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OS File Integrity Monitor</title>
+    <style>
+        :root {
+            --bg-color: #1e1e2f;
+            --card-bg: #2a2a40;
+            --danger: #ff4c4c;
+            --success: #28a745;
+            --text: #ffffff;
+            --code-bg: #161625;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: var(--bg-color);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #444;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+        }
+
+        h1 { margin: 0; font-size: 1.6rem; display: flex; align-items: center; gap: 10px; }
+
+        .status-pill {
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 15px;
+            border-radius: 20px;
+            color: #aaa;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .alert-box {
+            background-color: var(--danger);
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .alert-time { font-size: 0.85em; font-weight: bold; opacity: 0.9; }
+        .alert-action { font-size: 0.85em; font-weight: 900; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+
+        .file-path { font-family: 'Fira Code', 'Courier New', monospace; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; font-size: 0.9em; word-break: break-all; }
+
+        .content-preview {
+            margin-top: 15px;
+            background-color: var(--code-bg);
+            color: #d1d1d1;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid rgba(0,0,0,0.3);
+        }
+
+        .content-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.7;
+            display: block;
+        }
+
+        .secure-msg {
+            background-color: var(--success);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-size: 1.1rem;
+        }
+
+        /* Scrollbar styling for the preview boxes */
+        .content-preview::-webkit-scrollbar { width: 8px; }
+        .content-preview::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .content-preview::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+    </style>
+
+    <script>
+        setTimeout(function(){
+           location.reload();
+        }, 5000);
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ FIM Alert Dashboard</h1>
+            <div class="status-pill">System Live • Last checked: {% now "H:i:s" %}</div>
+        </header>
+
+        {% if alerts %}
+            {% for alert in alerts %}
+                <div class="alert-box">
+                    <div class="alert-header">
+                        <span class="alert-time">🚨 {{ alert.timestamp|date:"M d, Y | H:i:s" }}</span>
+                        <span class="alert-action">{{ alert.message }}</span>
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
+                        <strong>Target File:</strong> <span class="file-path">{{ alert.file_path }}</span>
+                    </div>
+
+                    {% if alert.content %}
+                        <span class="content-label">File Contents at time of event:</span>
+                        <div class="content-preview">{{ alert.content }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="secure-msg">
+                ✅ System integrity verified. No unauthorized file changes detected.
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
